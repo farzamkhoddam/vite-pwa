@@ -7,20 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      manifest: {
-        name: "vite-pwa",
-        short_name: "vite-pwa",
-        start_url: "/",
-        display: "standalone",
-        background_color: "#ffffff",
-        lang: "en",
-        scope: "/",
-      },
       registerType: "autoUpdate",
-      injectRegister: "script",
-      workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-      },
     }),
   ],
 });
