@@ -7,3 +7,6 @@ export enum ComponentTypes {
   RATING = "Rating",
   SWITCH = "Switch"
 }
+export enum LocalStorageTypes {
+  DROPPEDITEMS = "DROPPEDITEMS",
+}
