@@ -9,4 +9,7 @@ export enum ComponentTypes {
 }
 export enum LocalStorageTypes {
   DROPPEDITEMS = "DROPPEDITEMS",
+  ROW_NUMBER = "ROW_NUMBER",
+  INVISIBLE_PARTS = "INVISIBLE_PARTS",
+  ALL_COLUMNS = "ALL_COLUMNS",
 }

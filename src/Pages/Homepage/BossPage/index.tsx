@@ -1,17 +1,21 @@
-import { useState } from "react";
 import Row from "./Row";
 import { Box, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+
+import { GridContext } from "../Context/GridContext";
+import React from "react";
 export default function BossPage() {
-  const [count, setCount] = useState(0);
-const handleAddButtonClick = () => {
-  setCount((prevCount) => prevCount + 1);
-};
+  const { rowCount, setRowCount } = React.useContext(GridContext);
+  const handleAddButtonClick = () => {
+    setRowCount && setRowCount((prevRowCount) => prevRowCount + 1);
+  };
+
   return (
     <Box>
-      {Array.from({ length: count }, (_, i) => i + 1).map((num) => (
-        <Row rowId={num} key={num} />
-      ))}
+      {rowCount &&
+        Array.from({ length: rowCount }, (_, i) => i + 1).map((num) => (
+          <Row uId={num} key={num} />
+        ))}
       <IconButton onClick={handleAddButtonClick}>
         <AddIcon />
       </IconButton>
