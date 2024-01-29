@@ -5,8 +5,8 @@ interface GridContextType {
   setRowCount?: React.Dispatch<React.SetStateAction<number>>;
   invisibleParts?: number[];
   setInvisibleParts?: React.Dispatch<React.SetStateAction<number[]>>;
-  allColumns?: number[];
-  setAllColumns?: React.Dispatch<React.SetStateAction<number[]>>;
+  uIDs?: number[];
+  setuIDs?: React.Dispatch<React.SetStateAction<number[]>>;
 }
 const GridContext = createContext<GridContextType>({});
 const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -16,8 +16,8 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [invisibleParts, setInvisibleParts] = useState<number[]>(
     JSON.parse(localStorage.getItem(LocalStorageTypes.INVISIBLE_PARTS) || "[]")
   );
-  const [allColumns, setAllColumns] = useState<number[]>(
-    JSON.parse(localStorage.getItem(LocalStorageTypes.ALL_COLUMNS) || "[]")
+  const [uIDs, setuIDs] = useState<number[]>(
+    JSON.parse(localStorage.getItem(LocalStorageTypes.UIDS) || "[]")
   );
   useEffect(() => {
     localStorage.setItem(LocalStorageTypes.ROW_NUMBER, rowCount.toString());
@@ -29,8 +29,8 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }, [invisibleParts]);
   useEffect(() => {
-    localStorage.setItem(LocalStorageTypes.ALL_COLUMNS, `[${allColumns}]`);
-  }, [allColumns]);
+    localStorage.setItem(LocalStorageTypes.UIDS, `[${uIDs}]`);
+  }, [uIDs]);
   return (
     <GridContext.Provider
       value={{
@@ -38,8 +38,8 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
         setRowCount,
         invisibleParts,
         setInvisibleParts,
-        allColumns,
-        setAllColumns,
+        uIDs,
+        setuIDs,
       }}>
       {children}
     </GridContext.Provider>

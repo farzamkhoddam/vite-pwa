@@ -1,5 +1,5 @@
 import { Button, Input, Rating, Switch, Typography } from "@mui/material";
-import { ComponentTypes } from "../../Types";
+import { ComponentTypes } from "../../../Types";
 
 export default function ComponentLauncher({
   componentName,
@@ -25,4 +25,3 @@ export default function ComponentLauncher({
       break;
   }
 }
-

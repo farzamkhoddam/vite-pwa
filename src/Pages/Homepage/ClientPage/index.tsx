@@ -1,12 +1,12 @@
 import Box from "@mui/material/Box";
 import ListDrawer from "./ListDrawer";
 import { useDrop } from "react-dnd";
-import { ComponentTypes, ItemType, LocalStorageTypes } from "../../Types";
+import { ComponentTypes, ItemType, LocalStorageTypes } from "../../../Types";
 import ComponentLauncher from "./ComponentLauncher";
 import { useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {  Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function ClientPage() {
   const savedDroppedItems =

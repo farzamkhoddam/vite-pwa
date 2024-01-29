@@ -4,6 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import { GridContext } from "../Context/GridContext";
 import React from "react";
+import Menu from "./Menu";
 export default function BossPage() {
   const { rowCount, setRowCount } = React.useContext(GridContext);
   const handleAddButtonClick = () => {
@@ -12,6 +13,7 @@ export default function BossPage() {
 
   return (
     <Box>
+      <Menu />
       {rowCount &&
         Array.from({ length: rowCount }, (_, i) => i + 1).map((num) => (
           <Row uId={num} key={num} />

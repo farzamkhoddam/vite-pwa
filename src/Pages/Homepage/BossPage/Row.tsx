@@ -1,4 +1,4 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { HTMLAttributes, useEffect, useState } from "react";
 import Column from "./Column";
 import AddIcon from "@mui/icons-material/Add";
@@ -17,18 +17,18 @@ const Row: React.FC<Props> = ({
   variant = "normal",
 }) => {
   const uIdLength = uId.toString().length;
-  const { invisibleParts, setInvisibleParts, allColumns, setAllColumns } =
+  const { invisibleParts, setInvisibleParts, uIDs, setuIDs } =
     React.useContext(GridContext);
   const [isVisible, setIsVisible] = useState(true);
   // the number of columns under this row
   const [count, setCount] = useState(
-    allColumns
+    uIDs
       ?.filter((UID) => UID.toString().length === uIdLength + 1)
       .filter((UID) => UID.toString().startsWith(uId.toString())).length || 1
   );
   // the number the columns are divided by in order to find their width
   const [totalColumns, setTotalColumns] = useState(
-    allColumns
+    uIDs
       ?.filter((UID) => UID.toString().length === uIdLength + 1)
       .filter((UID) => UID.toString().startsWith(uId.toString()))
       .filter((UID) => !invisibleParts?.includes(UID)).length || 1
@@ -51,8 +51,8 @@ const Row: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalColumns, uId]);
   useEffect(() => {
-    if (allColumns && setAllColumns && !allColumns.includes(uId)) {
-      setAllColumns([...allColumns, uId]);
+    if (uIDs && setuIDs && !uIDs.includes(uId)) {
+      setuIDs([...uIDs, uId]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -65,18 +65,18 @@ const Row: React.FC<Props> = ({
           position: "relative",
           display: "flex",
           borderBottom: "1px solid",
-          borderColor: variant === "normal" ? "gray" : "red",
+          borderColor: variant === "normal" ? "gray" : "primary.dark",
         }}>
-        <IconButton
+        <Button
           sx={{
             position: "absolute",
             top: "0.5rem",
             left: "0.5rem",
-            zIndex: "1000",
+            zIndex: 1000,
           }}
           onClick={handleAddButtonClick}>
-          <AddIcon />
-        </IconButton>
+          <AddIcon /> Add column
+        </Button>
         {Array.from({ length: count }, (_, i) => i + 1).map((num) => (
           <Column
             widthDivider={totalColumns}

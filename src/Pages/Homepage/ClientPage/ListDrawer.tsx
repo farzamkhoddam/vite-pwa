@@ -1,6 +1,6 @@
 import { Drawer, Toolbar, Box, List } from "@mui/material";
 import DraggableListItems from "./DraggableListItems";
-import { ComponentTypes } from "../../Types";
+import { ComponentTypes } from "../../../Types";
 const drawerWidth = 240;
 
 const ListDrawer = () => {
