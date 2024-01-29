@@ -1,5 +1,6 @@
 import { Button, Input, Rating, Switch, Typography } from "@mui/material";
-import { ComponentTypes } from "../../../Types";
+import { ComponentTypes } from "../Types";
+import ClientMenu from "../ClientComponents/ClientMenu";
 
 export default function ComponentLauncher({
   componentName,
@@ -21,6 +22,14 @@ export default function ComponentLauncher({
       );
     case ComponentTypes.SWITCH:
       return <Switch />;
+    case ComponentTypes.MENU:
+      return <ClientMenu />;
+    case ComponentTypes.SLIDER:
+      // farzam
+      return <Switch />;
+    case ComponentTypes.NEWS:
+      // farzam
+      return <Button> button</Button>;
     default:
       break;
   }

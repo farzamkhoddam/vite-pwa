@@ -6,7 +6,6 @@ import { GridContextProvider } from "./Context/GridContext";
 export default function Homepage() {
   const [searchParams] = useSearchParams();
 
-  return <ClientPage />;
   if (searchParams.get("boss") === "true") {
     return (
       <GridContextProvider>
@@ -14,5 +13,6 @@ export default function Homepage() {
       </GridContextProvider>
     );
   }
+  return <ClientPage />;
 
 }

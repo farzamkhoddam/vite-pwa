@@ -7,7 +7,7 @@ import Row from "./Row";
 import AddIcon from "@mui/icons-material/Add";
 import { useDrop } from "react-dnd";
 import { ComponentTypes, ItemType } from "../../../Types";
-import ComponentLauncher from "../ClientPage/ComponentLauncher";
+import ComponentLauncher from "../../../Components/ComponentLauncher";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   widthDivider: number;
   setTotalColumns: React.Dispatch<React.SetStateAction<number>>;
