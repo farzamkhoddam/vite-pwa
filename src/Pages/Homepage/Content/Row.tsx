@@ -1,9 +1,12 @@
 import { Box, Button } from "@mui/material";
 import { HTMLAttributes, useEffect, useState } from "react";
 import Column from "./Column";
-import AddIcon from "@mui/icons-material/Add";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import { GridContext } from "../Context/GridContext";
 import React from "react";
+import { useSearchParams } from "react-router-dom";
+import interact from "interactjs";
+import { LocalStorageTypes } from "../../../Types";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   uId: number;
   variant?: "normal" | "nested";
@@ -16,6 +19,8 @@ const Row: React.FC<Props> = ({
   setTotalRows,
   variant = "normal",
 }) => {
+  const [searchParams] = useSearchParams();
+  const isClientBoss = searchParams.get("boss") === "true";
   const uIdLength = uId.toString().length;
   const { invisibleParts, setInvisibleParts, uIDs, setuIDs } =
     React.useContext(GridContext);
@@ -56,27 +61,67 @@ const Row: React.FC<Props> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // interact js
+  interact(`.row-${uId}`).resizable({
+    edges: {
+      bottom: true,
+    },
+    listeners: {
+      move: function (event) {
+        const target = event.target;
+        const rect = event.rect;
+        const nextSibling = event.target.nextElementSibling;
+        const prevSibling = event.target.prevElementSibling;
+        if (nextSibling) {
+          nextSibling.style.height =
+            nextSibling.offsetHeight - event.deltaRect.height + "px";
+        }
+        if (prevSibling) {
+          prevSibling.style.height =
+            prevSibling.offsetHeight - event.deltaRect.height + "px";
+        }
+        target.style.height = rect.height + "px";
+        localStorage.setItem(
+          `${LocalStorageTypes.BOX_HEIGHT}-${uId}`,
+          rect.height
+        );
+      },
+    },
+  });
+  const initialHeight = localStorage.getItem(
+    `${LocalStorageTypes.BOX_HEIGHT}-${uId}`
+  )
+    ? `${localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)}px`
+    : "15rem";
   if (isVisible)
     return (
       <Box
+        className={`row-${uId}`}
         sx={{
           width: 1,
-          height: variant === "normal" ? "15rem" : 100 / totalRows + "%",
+          minHeight:"50px",
+          height: variant === "normal" ? initialHeight : 100 / totalRows + "%",
+          flexGrow: initialHeight ? 0 : 1,
+          flexShrink: initialHeight ? 1 : 100,
           position: "relative",
           display: "flex",
-          borderBottom: "1px solid",
+          borderBottom: isClientBoss ? "1px solid" : "0",
+          borderTop: isClientBoss ? "1px solid" : "0",
           borderColor: variant === "normal" ? "gray" : "primary.dark",
         }}>
-        <Button
-          sx={{
-            position: "absolute",
-            top: "0.5rem",
-            left: "0.5rem",
-            zIndex: 1000,
-          }}
-          onClick={handleAddButtonClick}>
-          <AddIcon /> Add column
-        </Button>
+        {isClientBoss && (
+          <Button
+            sx={{
+              maxWidth: "fit-content",
+              position: "absolute",
+              top: "0.5rem",
+              left: "0.5rem",
+              zIndex: 999999,
+            }}
+            onClick={handleAddButtonClick}>
+            <ViewColumnIcon />
+          </Button>
+        )}
         {Array.from({ length: count }, (_, i) => i + 1).map((num) => (
           <Column
             widthDivider={totalColumns}

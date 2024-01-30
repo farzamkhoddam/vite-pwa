@@ -29,6 +29,7 @@ const [selectedComponent,setSelectedComponent] = useState<ComponentTypes>(Compon
           }}>
           {" "}
           <ComponentLauncher componentName={selectedComponent} />
+          
         </Box>
       </Box>
     );

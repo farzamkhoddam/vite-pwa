@@ -1,18 +1,12 @@
-import { useSearchParams } from "react-router-dom";
-import ClientPage from "./ClientPage";
-import BossPage from "./BossPage";
+import Content from "./Content";
 import { GridContextProvider } from "./Context/GridContext";
 
 export default function Homepage() {
-  const [searchParams] = useSearchParams();
 
-  if (searchParams.get("boss") === "true") {
     return (
       <GridContextProvider>
-        <BossPage />{" "}
+        <Content />{" "}
       </GridContextProvider>
     );
-  }
-  return <ClientPage />;
 
 }

@@ -1,13 +1,15 @@
 import { Box, Button, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { HTMLAttributes, useEffect, useState } from "react";
 import { GridContext } from "../Context/GridContext";
 import React from "react";
 import Row from "./Row";
-import AddIcon from "@mui/icons-material/Add";
+import TableRowsIcon from "@mui/icons-material/TableRows";
 import { useDrop } from "react-dnd";
-import { ComponentTypes, ItemType } from "../../../Types";
+import { ComponentTypes, ItemType, LocalStorageTypes } from "../../../Types";
 import ComponentLauncher from "../../../Components/ComponentLauncher";
+import { useSearchParams } from "react-router-dom";
+import interact from "interactjs";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   widthDivider: number;
   setTotalColumns: React.Dispatch<React.SetStateAction<number>>;
@@ -18,6 +20,8 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
     (localStorage.getItem(uId.toString()) as ComponentTypes) ||
       ComponentTypes.EMPTY
   );
+  const [searchParams] = useSearchParams();
+  const isClientBoss = searchParams.get("boss") === "true";
   const { invisibleParts, setInvisibleParts, uIDs, setuIDs } =
     React.useContext(GridContext);
   const uIdLength = uId.toString().length;
@@ -31,6 +35,9 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
   const [totalRows, setTotalRows] = useState(
     uIdsChildren?.filter((UID) => !invisibleParts?.includes(UID)).length || 0
   );
+  const hasChildren =
+    uIdsChildren &&
+    uIdsChildren?.filter((UID) => !invisibleParts?.includes(UID))?.length > 0;
   //
   const handleAddButtonClick = () => {
     setCount((prevCount) => prevCount + 1);
@@ -55,10 +62,10 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uIDs, invisibleParts]);
   //
-
+// drpped handler
   const [refProps, drop] = useDrop(
     () => ({
-      accept: ItemType.listItem,
+      accept: hasChildren ? "": ItemType.listItem,
       drop: (item: { name: ComponentTypes }, monitor) => {
         const didDrop = monitor.didDrop();
         if (didDrop) {
@@ -74,19 +81,58 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
     }),
     [uIDs, invisibleParts, count, uId]
   );
+  // 
+
+  // resize 
+   const [initialWidth, setInitialWidth] = useState(
+     localStorage.getItem(`${LocalStorageTypes.BOX_WIDTH}-${uId}`)
+   );
+  interact(`.column-${uId}`).resizable({
+    edges: { right: true },
+    listeners: {
+      move: function (event) {
+        const target = event.target;
+        const rect = event.rect;
+        const nextSibling = event.target.nextElementSibling;
+        const prevSibling = event.target.prevElementSibling;
+        if (nextSibling) {
+          nextSibling.style.width =
+            nextSibling.offsetWidth - event.deltaRect.width + "px";
+        }
+        if (prevSibling) {
+          prevSibling.style.width =
+            prevSibling.offsetWidth - event.deltaRect.width + "px";
+        }
+        target.style.width = rect.width + "px";
+        localStorage.setItem(
+          `${LocalStorageTypes.BOX_WIDTH}-${uId}`,
+          rect.width
+        );
+        setInitialWidth(rect.width);
+      },
+    },
+  });
+ 
+
   if (isVisible)
     return (
       <Box
+        className={`column-${uId}`}
         ref={drop}
         {...refProps}
         sx={{
-          width: 100 / widthDivider + "%",
+          width: initialWidth ? `${initialWidth}px` : 100 / widthDivider + "%",
+          minWidth: "100px",
           height: 1,
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          flexGrow: initialWidth ? 0 : 1,
+          flexShrink: initialWidth ? 1 : 100,
+          justifyContent: droppedItem !== ComponentTypes.EMPTY ? "center" : "unset",
+          alignItems: droppedItem !== ComponentTypes.EMPTY ? "center" : "unset",
+          flexWrap: droppedItem !== ComponentTypes.EMPTY ? "wrap" : "unset",
+          flexDirection: "column",
           position: "relative",
-          borderRight: widthDivider > 1 ? "1px solid" : "0px",
+          borderRight: isClientBoss ? "1px solid" : "0px",
           borderColor: "gray",
         }}>
         <ComponentLauncher
@@ -103,28 +149,31 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
               key={num}
             />
           ))}
-        {droppedItem === ComponentTypes.EMPTY && (
+        {droppedItem === ComponentTypes.EMPTY && isClientBoss && (
           <Button
             sx={{
+              maxWidth: "fit-content",
+              maxHeight: "fit-content",
               position: "absolute",
               left: "0.5rem",
               top: "50%",
             }}
             onClick={handleAddButtonClick}>
-            <AddIcon /> Add Row
+            <TableRowsIcon />
           </Button>
         )}
-
-        <IconButton
-          onClick={CloseHandler}
-          sx={{
-            position: "absolute",
-            top: "0.5rem",
-            right: "0.5rem",
-            zIndex: uId,
-          }}>
-          <CloseIcon />
-        </IconButton>
+        {isClientBoss && (
+          <IconButton
+            onClick={CloseHandler}
+            sx={{
+              position: "absolute",
+              top: "0.5rem",
+              right: "0.5rem",
+              zIndex: uId.toString().length,
+            }}>
+            <DeleteIcon color={"error"} />
+          </IconButton>
+        )}
       </Box>
     );
 };

@@ -11,7 +11,7 @@ const Menu = () => {
     ComponentTypes.SWITCH,
   ];
   return (
-    <AppBar position="fixed">
+    <AppBar sx={{zIndex:999999}} position="fixed">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Link
           to={{

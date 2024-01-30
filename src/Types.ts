@@ -17,6 +17,8 @@ export enum LocalStorageTypes {
   INVISIBLE_PARTS = "INVISIBLE_PARTS",
   UIDS = "UIDS",
   MENU_ITEMS = "MENU_ITEMS",
+  BOX_WIDTH = "BOX_WIDTH",
+  BOX_HEIGHT = "BOX_HEIGHT",
 }
 export interface SubGenre {
   href: string;
