@@ -61,7 +61,12 @@ const Row: React.FC<Props> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // interact js
+  // resize
+  const [initialHeight, setInitialHeight] = useState(
+    localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)
+      ? `${localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)}px`
+      : "15rem"
+  );
   interact(`.row-${uId}`).resizable({
     edges: {
       bottom: true,
@@ -85,21 +90,18 @@ const Row: React.FC<Props> = ({
           `${LocalStorageTypes.BOX_HEIGHT}-${uId}`,
           rect.height
         );
+        setInitialHeight(rect.height);
       },
     },
   });
-  const initialHeight = localStorage.getItem(
-    `${LocalStorageTypes.BOX_HEIGHT}-${uId}`
-  )
-    ? `${localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)}px`
-    : "15rem";
+
   if (isVisible)
     return (
       <Box
         className={`row-${uId}`}
         sx={{
           width: 1,
-          minHeight:"50px",
+          minHeight: "50px",
           height: variant === "normal" ? initialHeight : 100 / totalRows + "%",
           flexGrow: initialHeight ? 0 : 1,
           flexShrink: initialHeight ? 1 : 100,
