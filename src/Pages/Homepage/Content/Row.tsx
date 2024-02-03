@@ -1,60 +1,78 @@
 import { Box, Button } from "@mui/material";
 import { HTMLAttributes, useEffect, useState } from "react";
 import Column from "./Column";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import { GridContext } from "../Context/GridContext";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import interact from "interactjs";
 import { LocalStorageTypes } from "../../../Types";
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   uId: number;
   variant?: "normal" | "nested";
   totalRows?: number;
   setTotalRows?: React.Dispatch<React.SetStateAction<number>>;
+  rows: number[];
 }
 const Row: React.FC<Props> = ({
   uId,
   totalRows = 1,
   setTotalRows,
   variant = "normal",
+  rows,
 }) => {
   const [searchParams] = useSearchParams();
   const isClientBoss = searchParams.get("boss") === "true";
-  const uIdLength = uId.toString().length;
-  const { invisibleParts, setInvisibleParts, uIDs, setuIDs } =
+  const {  uIDs, setuIDs } =
     React.useContext(GridContext);
+  const uIdLength = uId.toString().length;
+    
   const [isVisible, setIsVisible] = useState(true);
-  // the number of columns under this row
-  const [count, setCount] = useState(
-    uIDs
-      ?.filter((UID) => UID.toString().length === uIdLength + 1)
-      .filter((UID) => UID.toString().startsWith(uId.toString())).length || 1
-  );
   // the number the columns are divided by in order to find their width
   const [totalColumns, setTotalColumns] = useState(
     uIDs
       ?.filter((UID) => UID.toString().length === uIdLength + 1)
-      .filter((UID) => UID.toString().startsWith(uId.toString()))
-      .filter((UID) => !invisibleParts?.includes(UID)).length || 1
+      .filter((UID) => UID.toString().startsWith(uId.toString())).length || 1
   );
+
+  // the number of columns under this row
+  const [columns, setColumns] = useState(uIDs
+      ?.filter((UID) => UID.toString().length === uIdLength + 1)
+      .filter((UID) => UID.toString().startsWith(uId.toString())) || []);
   const handleAddButtonClick = () => {
-    setCount((prevCount) => prevCount + 1);
-    setTotalColumns((prevCount) => prevCount + 1);
+    const index = uIDs?.findIndex((item) => item === uId) || 0;
+setTotalRows && setTotalRows((prevNum) => prevNum + 1);
+    if (index !== -1) {
+      setuIDs &&
+        uIDs &&
+        setuIDs([
+          ...uIDs.slice(0, index + 1),
+          JSON.parse(`${Math.max(...rows) + 1}`),
+          ...uIDs.slice(index + 1),
+        ]);
+    }
   };
   useEffect(() => {
-    if (totalColumns === 0) {
+    console.log("farzam rows ===",totalRows)
+    if (totalColumns === 0 && isVisible) {
       setIsVisible(false);
       setTotalRows && setTotalRows((prevNum) => prevNum - 1);
-      setInvisibleParts &&
-        invisibleParts &&
-        setInvisibleParts([...invisibleParts, uId]);
+       setuIDs &&
+      uIDs &&
+      setuIDs(
+        uIDs?.filter((UID) => !UID.toString().startsWith(uId.toString()))
+      );}
+    if (columns?.length === 0) {
+      setColumns([JSON.parse(`${uId}${totalColumns}`)]);
+    } else {
+      setColumns(uIDs
+      ?.filter((UID) => UID.toString().length === uIdLength + 1)
+      .filter((UID) => UID.toString().startsWith(uId.toString())) || []);
     }
-    if (invisibleParts?.includes(uId)) {
-      setIsVisible(false);
-    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalColumns, uId]);
+  }, [uId, uIDs]);
   useEffect(() => {
     if (uIDs && setuIDs && !uIDs.includes(uId)) {
       setuIDs([...uIDs, uId]);
@@ -107,6 +125,7 @@ const Row: React.FC<Props> = ({
           flexShrink: initialHeight ? 1 : 100,
           position: "relative",
           display: "flex",
+          border: variant === "nested" && isClientBoss ? "1px solid" : "0",
           borderBottom: isClientBoss ? "1px solid" : "0",
           borderTop: isClientBoss ? "1px solid" : "0",
           borderColor: variant === "normal" ? "gray" : "primary.dark",
@@ -116,20 +135,22 @@ const Row: React.FC<Props> = ({
             sx={{
               maxWidth: "fit-content",
               position: "absolute",
-              top: "0.5rem",
-              left: "0.5rem",
+              bottom: "0",
+              left: "50%",
+              transform: "translate(-50%,50%)",
               zIndex: 999999,
             }}
             onClick={handleAddButtonClick}>
-            <ViewColumnIcon />
+            <ControlPointOutlinedIcon fontSize="large" />
           </Button>
         )}
-        {Array.from({ length: count }, (_, i) => i + 1).map((num) => (
+        {columns?.map((num) => (
           <Column
             widthDivider={totalColumns}
             setTotalColumns={setTotalColumns}
+            columns={columns}
             key={num}
-            uId={JSON.parse(`${uId}${num}`)}
+            uId={JSON.parse(`${num}`)}
           />
         ))}
       </Box>

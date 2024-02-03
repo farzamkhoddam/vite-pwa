@@ -1,92 +1,154 @@
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, IconButton, Paper, useTheme } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { HTMLAttributes, useEffect, useState } from "react";
 import { GridContext } from "../Context/GridContext";
 import React from "react";
 import Row from "./Row";
-import TableRowsIcon from "@mui/icons-material/TableRows";
 import { useDrop } from "react-dnd";
 import { ComponentTypes, ItemType, LocalStorageTypes } from "../../../Types";
 import ComponentLauncher from "../../../Components/ComponentLauncher";
 import { useSearchParams } from "react-router-dom";
 import interact from "interactjs";
+import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
+import SortIcon from "@mui/icons-material/Sort";
+import BackspaceIcon from "@mui/icons-material/Backspace";
 interface Props extends HTMLAttributes<HTMLDivElement> {
   widthDivider: number;
   setTotalColumns: React.Dispatch<React.SetStateAction<number>>;
   uId: number;
+  columns: number[];
 }
-const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
-  const [droppedItem, setDroppedItem] = useState<ComponentTypes>(
-    (localStorage.getItem(uId.toString()) as ComponentTypes) ||
-      ComponentTypes.EMPTY
+const Column: React.FC<Props> = ({
+  setTotalColumns,
+  columns,
+  widthDivider,
+  uId,
+}) => {
+  // MUI related
+  const theme = useTheme();
+  //
+  const [droppedItems, setDroppedItems] = useState<ComponentTypes[]>(
+    JSON.parse(localStorage.getItem(uId.toString()) || `[]`) as ComponentTypes[]
   );
   const [searchParams] = useSearchParams();
   const isClientBoss = searchParams.get("boss") === "true";
-  const { invisibleParts, setInvisibleParts, uIDs, setuIDs } =
-    React.useContext(GridContext);
+  const { uIDs, setuIDs } = React.useContext(GridContext);
   const uIdLength = uId.toString().length;
-  const uIdsChildren = uIDs
-    ?.filter((UID) => UID.toString().length === uIdLength + 1)
-    .filter((UID) => UID.toString().startsWith(uId.toString()));
+
   const [isVisible, setIsVisible] = useState(true);
   // the number of rows under this column
-  const [count, setCount] = useState(uIdsChildren?.length || 0);
+  const [rows, setRows] = useState(
+    uIDs
+      ?.filter((UID) => UID.toString().length === uIdLength + 1)
+      .filter((UID) => UID.toString().startsWith(uId.toString())) || []
+  );
   // the number the rows are divided by in order to find their height
   const [totalRows, setTotalRows] = useState(
-    uIdsChildren?.filter((UID) => !invisibleParts?.includes(UID)).length || 0
+    uIDs
+      ?.filter((UID) => UID.toString().length === uIdLength + 1)
+      .filter((UID) => UID.toString().startsWith(uId.toString()))?.length || 0
   );
-  const hasChildren =
-    uIdsChildren &&
-    uIdsChildren?.filter((UID) => !invisibleParts?.includes(UID))?.length > 0;
+  const hasChildren: boolean = !!uIDs
+    ?.filter((UID) => UID.toString().length === uIdLength + 1)
+    .filter((UID) => UID.toString().startsWith(uId.toString())).length;
   //
-  const handleAddButtonClick = () => {
-    setCount((prevCount) => prevCount + 1);
-    setTotalRows((prevCount) => prevCount + 1);
+  const handleAddColumnButtonClick = () => {
+    const index = uIDs?.findIndex((item) => item === uId) || 0;
+
+    if (index !== -1) {
+      setuIDs &&
+        uIDs &&
+        setuIDs([
+          ...uIDs.slice(0, index + 1),
+          JSON.parse(`${Math.max(...columns) + 1}`),
+          ...uIDs.slice(index + 1),
+        ]);
+    }
+
+    setTotalColumns((prevColumns) => prevColumns + 1);
+  };
+  const handleAddRowButtonClick = () => {
+    setRows((prevrows) => [...prevrows, JSON.parse(`${uId}${totalRows + 1}`)]);
+    setTotalRows((prevRows) => prevRows + 1);
   };
   //
   function CloseHandler() {
     setTotalColumns((prevNum) => prevNum - 1);
     setIsVisible(false);
-    setInvisibleParts &&
-      invisibleParts &&
-      setInvisibleParts([...invisibleParts, uId]);
+    localStorage.removeItem(
+      JSON.stringify(
+        uIDs?.filter((UID) => UID.toString().startsWith(uId.toString()))[0] || 0
+      )
+    );
+
+    setuIDs &&
+      uIDs &&
+      setuIDs(
+        uIDs?.filter((UID) => !UID.toString().startsWith(uId.toString()))
+      );
   }
   //
   useEffect(() => {
-    if (uIDs && setuIDs && !uIDs.includes(uId)) {
+    if (uIDs && setuIDs && !uIDs.includes(uId) && isVisible) {
       setuIDs([...uIDs, uId]);
     }
-    if (invisibleParts?.includes(uId)) {
-      setIsVisible(false);
-    }
+    setRows(
+      uIDs
+        ?.filter((UID) => UID.toString().length === uIdLength + 1)
+        .filter((UID) => UID.toString().startsWith(uId.toString())) || []
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uIDs, invisibleParts]);
+  }, [uIDs]);
   //
-// drpped handler
+  const moveItem = (dragIndex: number, hoverIndex: number) => {
+    const newItems = droppedItems;
+    const dragItem = newItems[dragIndex];
+    console.log("farzam dragIndex ===", dragIndex);
+    console.log("farzam hoverIndex ===", hoverIndex);
+    newItems.splice(dragIndex, 1);
+    newItems.splice(hoverIndex, 0, dragItem);
+    console.log("farzam newItems ===", newItems);
+    setDroppedItems([...newItems]);
+
+  };
+  // drpped handler
+
   const [refProps, drop] = useDrop(
     () => ({
-      accept: hasChildren ? "": ItemType.listItem,
-      drop: (item: { name: ComponentTypes }, monitor) => {
+      accept: hasChildren ? "" : ItemType.listItem,
+      drop: (item: { name: ComponentTypes; index: number }, monitor) => {
         const didDrop = monitor.didDrop();
         if (didDrop) {
           return;
         }
-        setDroppedItem(item.name);
-        localStorage.setItem(uId.toString(), item.name);
+
+        if (!item.index) {
+          setDroppedItems((prevItems) => [...prevItems, item.name]);
+        }
       },
+
       collect: (monitor) => ({
         isOver: monitor.isOver(),
         isOverCurrent: monitor.isOver({ shallow: true }),
       }),
     }),
-    [uIDs, invisibleParts, count, uId]
+    [uIDs, rows, uId]
   );
-  // 
+  // clear column
+  function handleClearComponentsClicked() {
+    setDroppedItems([]);
+    localStorage.removeItem(uId.toString());
+  }
+  useEffect(() => {
+    localStorage.setItem(uId.toString(), JSON.stringify(droppedItems));
+    console.log("farzam droppedItems ===",droppedItems)
+  }, [droppedItems, uId]);
+  //
 
-  // resize 
-   const [initialWidth, setInitialWidth] = useState(
-     localStorage.getItem(`${LocalStorageTypes.BOX_WIDTH}-${uId}`)
-   );
+  // resize
+  const [initialWidth, setInitialWidth] = useState(
+    localStorage.getItem(`${LocalStorageTypes.BOX_WIDTH}-${uId}`)
+  );
   interact(`.column-${uId}`).resizable({
     edges: { right: true },
     listeners: {
@@ -112,7 +174,6 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
       },
     },
   });
- 
 
   if (isVisible)
     return (
@@ -124,54 +185,104 @@ const Column: React.FC<Props> = ({ setTotalColumns, widthDivider, uId }) => {
           width: initialWidth ? `${initialWidth}px` : 100 / widthDivider + "%",
           minWidth: "100px",
           height: 1,
+          p: 3,
           display: "flex",
+
           flexGrow: initialWidth ? 0 : 1,
           flexShrink: initialWidth ? 1 : 100,
-          justifyContent: droppedItem !== ComponentTypes.EMPTY ? "center" : "unset",
-          alignItems: droppedItem !== ComponentTypes.EMPTY ? "center" : "unset",
-          flexWrap: droppedItem !== ComponentTypes.EMPTY ? "wrap" : "unset",
+          justifyContent: droppedItems.length !== 0 ? "center" : "unset",
+          alignItems: droppedItems.length !== 0 ? "center" : "unset",
+          flexWrap: droppedItems.length !== 0 ? "wrap" : "unset",
           flexDirection: "column",
           position: "relative",
           borderRight: isClientBoss ? "1px solid" : "0px",
           borderColor: "gray",
+          "&:hover": {
+            "& > .MuiPaper-root ": {
+              opacity: 0.9,
+              visibility: "visible",
+            },
+          },
         }}>
-        <ComponentLauncher
-          componentName={droppedItem || ComponentTypes.EMPTY}
-        />
-        {count > 0 &&
-          droppedItem === ComponentTypes.EMPTY &&
-          Array.from({ length: count }, (_, i) => i + 1).map((num) => (
+        {droppedItems.map((droppedItem, i) => (
+          <ComponentLauncher
+            key={i}
+            moveItem={moveItem}
+            index={i}
+            componentName={droppedItem || ComponentTypes.EMPTY}
+            canEdit={isClientBoss ?true:false}
+          />
+        ))}
+        {rows.length > 0 &&
+          droppedItems.length === 0 &&
+          rows?.map((num) => (
             <Row
+              rows={rows}
               setTotalRows={setTotalRows}
               variant="nested"
               totalRows={totalRows}
-              uId={JSON.parse(`${uId}${num}`)}
+              uId={JSON.parse(`${num}`)}
               key={num}
             />
           ))}
-        {droppedItem === ComponentTypes.EMPTY && isClientBoss && (
-          <Button
+
+        {isClientBoss && !hasChildren && (
+          <Paper
+            elevation={5}
             sx={{
-              maxWidth: "fit-content",
-              maxHeight: "fit-content",
+              opacity: 0,
+              backgroundColor: "#F6F6F6",
               position: "absolute",
-              left: "0.5rem",
-              top: "50%",
-            }}
-            onClick={handleAddButtonClick}>
-            <TableRowsIcon />
-          </Button>
+              top: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              transition: "all 0.3s ease",
+              visibility: "hidden",
+            }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}>
+              <IconButton
+                onClick={CloseHandler}
+                sx={{
+                  zIndex: uId.toString().length,
+                }}>
+                <DeleteIcon color={"error"} />
+              </IconButton>
+              {droppedItems.length === 0 && (
+                <IconButton onClick={handleAddRowButtonClick}>
+                  <SortIcon
+                    sx={{
+                      color: theme.palette.grey[600],
+                    }}
+                  />
+                </IconButton>
+              )}
+              {droppedItems.length !== 0 && (
+                <IconButton onClick={handleClearComponentsClicked}>
+                  <BackspaceIcon color={"error"} />
+                </IconButton>
+              )}
+            </Box>
+          </Paper>
         )}
         {isClientBoss && (
           <IconButton
-            onClick={CloseHandler}
+            onClick={handleAddColumnButtonClick}
             sx={{
               position: "absolute",
-              top: "0.5rem",
-              right: "0.5rem",
+              top: "50%",
+              right: "0",
+              transform: "translate(50%, -50%)",
               zIndex: uId.toString().length,
             }}>
-            <DeleteIcon color={"error"} />
+            <ControlPointOutlinedIcon fontSize="large" color={"primary"} />
           </IconButton>
         )}
       </Box>
