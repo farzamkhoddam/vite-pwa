@@ -6,7 +6,6 @@ import { GridContext } from "../Context/GridContext";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
 import interact from "interactjs";
-import { LocalStorageTypes } from "../../../Types";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   uId: number;
@@ -24,65 +23,73 @@ const Row: React.FC<Props> = ({
 }) => {
   const [searchParams] = useSearchParams();
   const isClientBoss = searchParams.get("boss") === "true";
-  const {  uIDs, setuIDs } =
-    React.useContext(GridContext);
-  const uIdLength = uId.toString().length;
-    
-  const [isVisible, setIsVisible] = useState(true);
+  const { uIDs, setuIDs } = React.useContext(GridContext);
+  const uIdLength: number = uId?.toString().length;
+  const [isVisible, setIsVisible] = useState<boolean>(true);
   // the number the columns are divided by in order to find their width
-  const [totalColumns, setTotalColumns] = useState(
+  const [totalColumns, setTotalColumns] = useState<number>(
     uIDs
-      ?.filter((UID) => UID.toString().length === uIdLength + 1)
-      .filter((UID) => UID.toString().startsWith(uId.toString())).length || 1
+      ?.filter((UID) => {
+        UID.uId?.toString().length === uIdLength + 1;
+      })
+      .filter((UID) => UID.uId?.toString().startsWith(uId?.toString()))
+      .length || 1
   );
-
   // the number of columns under this row
-  const [columns, setColumns] = useState(uIDs
-      ?.filter((UID) => UID.toString().length === uIdLength + 1)
-      .filter((UID) => UID.toString().startsWith(uId.toString())) || []);
+  const [columns, setColumns] = useState(
+    uIDs
+      ?.filter((UID) => UID.uId?.toString().length === uIdLength + 1)
+      .filter((UID) => UID.uId?.toString().startsWith(uId?.toString())) || []
+  );
+  const uIdIndex = uIDs?.findIndex((item) => item.uId === uId) || 0;
   const handleAddButtonClick = () => {
-    const index = uIDs?.findIndex((item) => item === uId) || 0;
-setTotalRows && setTotalRows((prevNum) => prevNum + 1);
-    if (index !== -1) {
+    setTotalRows && setTotalRows((prevNum) => prevNum + 1);
+    if (uIdIndex !== -1) {
       setuIDs &&
         uIDs &&
         setuIDs([
-          ...uIDs.slice(0, index + 1),
-          JSON.parse(`${Math.max(...rows) + 1}`),
-          ...uIDs.slice(index + 1),
+          ...uIDs.slice(0, uIdIndex + 1),
+          { uId: JSON.parse(`${Math.max(...rows) + 1}`) },
+          ...uIDs.slice(uIdIndex + 1),
         ]);
     }
   };
   useEffect(() => {
-    console.log("farzam rows ===",totalRows)
     if (totalColumns === 0 && isVisible) {
       setIsVisible(false);
       setTotalRows && setTotalRows((prevNum) => prevNum - 1);
-       setuIDs &&
-      uIDs &&
-      setuIDs(
-        uIDs?.filter((UID) => !UID.toString().startsWith(uId.toString()))
-      );}
+      setuIDs &&
+        uIDs &&
+        setuIDs(
+          uIDs?.filter(
+            (UID) => !UID.uId?.toString().startsWith(uId?.toString())
+          )
+        );
+    }
     if (columns?.length === 0) {
-      setColumns([JSON.parse(`${uId}${totalColumns}`)]);
+      setColumns([{ uId: JSON.parse(`${uId}${totalColumns}`) }]);
     } else {
-      setColumns(uIDs
-      ?.filter((UID) => UID.toString().length === uIdLength + 1)
-      .filter((UID) => UID.toString().startsWith(uId.toString())) || []);
+      setColumns(
+        uIDs
+          ?.filter((UID) => UID.uId?.toString().length === uIdLength + 1)
+          .filter((UID) => UID.uId?.toString().startsWith(uId?.toString())) ||
+          []
+      );
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uId, uIDs]);
+
   useEffect(() => {
-    if (uIDs && setuIDs && !uIDs.includes(uId)) {
-      setuIDs([...uIDs, uId]);
+    if (uIDs && setuIDs && !uIDs.some((item) => item.uId === uId)) {
+      setuIDs([...uIDs, { uId }]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // resize
   const [initialHeight, setInitialHeight] = useState(
-    localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)
-      ? `${localStorage.getItem(`${LocalStorageTypes.BOX_HEIGHT}-${uId}`)}px`
+    uIDs?.filter((item) => item.uId === uId)[0]?.height
+      ? `${uIDs?.filter((item) => item.uId === uId)[0]?.height}px`
       : "15rem"
   );
   interact(`.row-${uId}`).resizable({
@@ -104,15 +111,16 @@ setTotalRows && setTotalRows((prevNum) => prevNum + 1);
             prevSibling.offsetHeight - event.deltaRect.height + "px";
         }
         target.style.height = rect.height + "px";
-        localStorage.setItem(
-          `${LocalStorageTypes.BOX_HEIGHT}-${uId}`,
-          rect.height
-        );
+
+        const upDatedArray = uIDs?.map((item, i) => {
+          if (i === uIdIndex) return { ...item, height: rect.height };
+          return item;
+        });
+        if (uIDs?.[uIdIndex] && setuIDs) setuIDs(upDatedArray || []);
         setInitialHeight(rect.height);
       },
     },
   });
-
   if (isVisible)
     return (
       <Box
@@ -144,15 +152,19 @@ setTotalRows && setTotalRows((prevNum) => prevNum + 1);
             <ControlPointOutlinedIcon fontSize="large" />
           </Button>
         )}
-        {columns?.map((num) => (
-          <Column
-            widthDivider={totalColumns}
-            setTotalColumns={setTotalColumns}
-            columns={columns}
-            key={num}
-            uId={JSON.parse(`${num}`)}
-          />
-        ))}
+        {columns?.map((num) => {
+          return (
+            <Column
+              widthDivider={totalColumns}
+              setTotalColumns={setTotalColumns}
+              columns={columns.map((item) => {
+                return item.uId;
+              })}
+              key={num.uId}
+              uId={num.uId}
+            />
+          );
+        })}
       </Box>
     );
 };

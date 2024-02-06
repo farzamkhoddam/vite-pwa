@@ -17,13 +17,26 @@ interface Props {
   index?: number;
   moveItem?: (dragIndex: number, hoverIndex: number) => void;
   canEdit?: boolean;
+  setDroppedItems: React.Dispatch<
+    React.SetStateAction<
+      {
+        name: ComponentTypes;
+        componentID: string;
+      }[]
+    >
+  >;
+  componentID: string;
+  uId: number;
 }
 
 export default function ComponentLauncher({
   componentName,
   index,
   moveItem,
+  setDroppedItems,
+  componentID,
   canEdit = false,
+  uId,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line no-empty-pattern
@@ -79,15 +92,24 @@ export default function ComponentLauncher({
     },
   });
   // eslint-disable-next-line no-empty-pattern
-  const [{}, drag] = useDrag(() => ({
-    type: ItemType.componentLauncherItem,
-    item: () => {
-      return { index, name: componentName };
-    },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
+  const [{}, drag] = useDrag(
+    () => ({
+      type: ItemType.componentLauncherItem,
+      item: () => {
+        return {
+          index,
+          name: componentName,
+          componentID: componentID,
+          currentParentUId: uId,
+          setOriginalColumnDroppedItems: setDroppedItems,
+        };
+      },
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
     }),
-  }));
+    [componentID, componentName, index]
+  );
   drag(drop(ref));
   switch (componentName) {
     case ComponentTypes.BUTTON:
@@ -149,7 +171,7 @@ const StyledBox = styled(Box, {
 })<{ canEdit: boolean }>(({ canEdit }) => ({
   border: canEdit ? "1px solid" : "unset",
   cursor: canEdit ? "grab" : "unset",
-  position:"relative",
+  position: "relative",
 }));
 const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
   background: theme.palette.primary.dark,
@@ -159,5 +181,5 @@ const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
   left: 0,
   transform: "translate(-100%,-50%)",
   zIndex: "50000",
-  width:"1rem"
+  width: "1rem",
 }));

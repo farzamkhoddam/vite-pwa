@@ -7,17 +7,25 @@ import Menu from "../../../Components/Menu";
 export default function BossPage() {
   const { uIDs } = React.useContext(GridContext);
   const [uIdRows, setUIdRows] = useState(
-    uIDs?.filter((uid) => uid.toString().length === 1)
+    uIDs?.filter((item) => item.uId?.toString().length === 1)
   );
   useEffect(() => {
     setUIdRows &&
-      setUIdRows(uIDs?.filter((uid) => uid.toString().length === 1));
+      setUIdRows(uIDs?.filter((item) => item.uId?.toString().length === 1));
   }, [uIDs, setUIdRows]);
   return (
-    <Box sx={{ pt: 8 , overflow: "hidden" }}>
+    <Box sx={{ pt: 8, overflow: "hidden" }}>
       <Menu />
       {uIdRows &&
-        uIdRows.map((num) => <Row rows={uIdRows} uId={num} key={num} />)}
+        uIdRows.map((num) => (
+          <Row
+            rows={uIdRows.map((item) => {
+              return item.uId;
+            })}
+            uId={num.uId}
+            key={num.uId}
+          />
+        ))}
     </Box>
   );
 }
