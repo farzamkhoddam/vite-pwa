@@ -14,7 +14,7 @@ export default function BossPage() {
       setUIdRows(uIDs?.filter((item) => item.uId?.toString().length === 1));
   }, [uIDs, setUIdRows]);
   return (
-    <Box sx={{ pt: 8, overflow: "hidden" }}>
+    <Box sx={{ py: 8, overflow: "hidden" }}>
       <Menu />
       {uIdRows &&
         uIdRows.map((num) => (

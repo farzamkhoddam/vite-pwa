@@ -180,23 +180,28 @@ const Column: React.FC<Props> = ({
   // clear column
   function handleClearComponentsClicked() {
     setDroppedItems([]);
-    localStorage.removeItem(uId?.toString());
   }
   useEffect(() => {
-    if (droppedItems.length > 0) {
-      const updatedUIds = uIDs?.map((item) => {
-        if (item.uId === uId) { 
-          console.log("farzam uId ===", uId);
-          console.log("farzam droppedItems ===",droppedItems)
-          return { ...item, components: droppedItems }}
-        return item
+    if ( uIDs) {
+      const uIdIndex = uIDs?.findIndex((item) => {
+       return item.uId === uId;
       });
-      console.log("farzam updatedUIds ===", updatedUIds);
-      
-      setuIDs && setuIDs(updatedUIds || []);
+      if (uIdIndex !== -1) {
+      // Clone the item to avoid direct mutation
+      const updatedItem = { ...uIDs[uIdIndex], components: droppedItems };
+console.log("farzam droppedItems ===", droppedItems);
+      // Update the state with the new item
+     setuIDs && setuIDs((prevState) => {
+        // Create a shallow copy of the previous state
+        const newState = [...prevState];
+        // Replace the item at the found index with the updated item
+        newState[uIdIndex] = updatedItem;
+        // Return the new state
+        return newState;
+      });
       // localStorage.setItem(uId?.toString(), JSON.stringify(droppedItems));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    }}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedItems, uId]);
   //
 

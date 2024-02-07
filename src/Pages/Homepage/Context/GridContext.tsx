@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { ComponentTypes, LocalStorageTypes } from "../../../Types";
 
-interface UIDType {
+export interface UIDType {
   uId: number;
   width?: number;
   height?: number;
@@ -35,6 +35,9 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
     JSON.parse(localStorage.getItem(LocalStorageTypes.UIDS) || '[{"uId":1}]')
   );
   useEffect(() => {
+    if(JSON.stringify(uIDs) === "[]"){
+      setuIDs([{"uId":1}]);
+    }
     localStorage.setItem(LocalStorageTypes.UIDS, JSON.stringify(uIDs));
   }, [uIDs]);
   return (
