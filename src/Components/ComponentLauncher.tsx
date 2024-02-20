@@ -17,7 +17,7 @@ interface Props {
   index?: number;
   moveItem?: (dragIndex: number, hoverIndex: number) => void;
   canEdit?: boolean;
-  setDroppedItems: React.Dispatch<
+  setDroppedItems?: React.Dispatch<
     React.SetStateAction<
       {
         name: ComponentTypes;
@@ -25,8 +25,8 @@ interface Props {
       }[]
     >
   >;
-  componentID: string;
-  uId: number;
+  componentID?: string;
+  uId?: number;
 }
 
 export default function ComponentLauncher({
@@ -95,6 +95,7 @@ export default function ComponentLauncher({
   const [{}, drag] = useDrag(
     () => ({
       type: ItemType.componentLauncherItem,
+      canDrag: canEdit,
       item: () => {
         return {
           index,
@@ -108,28 +109,28 @@ export default function ComponentLauncher({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [componentID, componentName, index]
+    [componentID, componentName, index, canEdit]
   );
   drag(drop(ref));
   switch (componentName) {
     case ComponentTypes.BUTTON:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <Button>Button</Button>
         </StyledBox>
       );
     case ComponentTypes.INPUT:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <Input type="solid" />
         </StyledBox>
       );
     case ComponentTypes.RATING:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />{" "}
+          {canEdit && <DragIcon />}
           <Typography component="legend">It sucks I know</Typography>
           <Rating name="simple-controlled" defaultValue={0.5} />
         </StyledBox>
@@ -137,28 +138,28 @@ export default function ComponentLauncher({
     case ComponentTypes.SWITCH:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <Switch />
         </StyledBox>
       );
     case ComponentTypes.MENU:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <ClientMenu />{" "}
         </StyledBox>
       );
     case ComponentTypes.SLIDER:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <Switch />
         </StyledBox>
       );
     case ComponentTypes.NEWS:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          <DragIcon />
+          {canEdit && <DragIcon />}
           <Button> button</Button>
         </StyledBox>
       );

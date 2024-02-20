@@ -98,13 +98,6 @@ const Column: React.FC<Props> = ({
   function CloseHandler() {
     setTotalColumns((prevNum) => prevNum - 1);
     setIsVisible(false);
-    localStorage.removeItem(
-      JSON.stringify(
-        uIDs?.filter((UID) =>
-          UID.uId?.toString().startsWith(uId?.toString())
-        )[0] || 0
-      )
-    );
 
     setuIDs &&
       uIDs &&
@@ -189,7 +182,6 @@ const Column: React.FC<Props> = ({
       if (uIdIndex !== -1) {
       // Clone the item to avoid direct mutation
       const updatedItem = { ...uIDs[uIdIndex], components: droppedItems };
-console.log("farzam droppedItems ===", droppedItems);
       // Update the state with the new item
      setuIDs && setuIDs((prevState) => {
         // Create a shallow copy of the previous state
@@ -199,7 +191,7 @@ console.log("farzam droppedItems ===", droppedItems);
         // Return the new state
         return newState;
       });
-      // localStorage.setItem(uId?.toString(), JSON.stringify(droppedItems));
+      
     }}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedItems, uId]);
@@ -241,7 +233,7 @@ console.log("farzam droppedItems ===", droppedItems);
         ref={drop}
         {...refProps}
         sx={{
-          width: initialWidth ? `${initialWidth}px` : 100 / widthDivider + "%",
+          width: initialWidth !== null ? `${initialWidth}px` : 100 / widthDivider + "%",
           minWidth: "100px",
           height: 1,
           p: 3,

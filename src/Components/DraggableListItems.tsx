@@ -4,7 +4,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 
 import { useDrag } from "react-dnd";
-import { ComponentTypes, ItemType } from "../../../Types";
+import { ComponentTypes, ItemType } from "../Types";
+
 
 const DraggableListItems = ({ text }: { text: ComponentTypes }) => {
   const [{ isDragging }, drag] = useDrag(() => ({

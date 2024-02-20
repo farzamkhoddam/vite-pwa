@@ -1,7 +1,20 @@
-import { AppBar, Box, List, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  CircularProgress,
+  List,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { ComponentTypes } from "../Types";
-import DraggableListItems from "../Pages/Homepage/ClientPage/DraggableListItems";
+import DraggableListItems from "./DraggableListItems";
 import { Link, useSearchParams } from "react-router-dom";
+import { useMutation } from "react-query";
+import axios from "axios";
+import { useContext } from "react";
+import toast from "react-hot-toast";
+import { GridContext } from "../Pages/Homepage/Context/GridContext";
 
 const Menu = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +25,25 @@ const Menu = () => {
     ComponentTypes.RATING,
     ComponentTypes.SWITCH,
   ];
+  const { uIDs } = useContext(GridContext);
+  const mutation = useMutation(
+    async () => {
+      const response = await axios.post(
+        "https://localhost:7215/api/layout",
+        uIDs
+      );
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        toast.success("Layout saved successfully!");
+      },
+      onError: () => {
+        toast.error("Something went wrong! Try again later");
+      },
+    }
+  );
+
   return (
     <AppBar sx={{ zIndex: 999999 }} position="fixed">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -21,6 +53,21 @@ const Menu = () => {
           }}>
           <Typography variant="h6">Homepage</Typography>
         </Link>
+        <Button
+          onClick={() => {
+            mutation.mutate();
+          }}
+          disabled={mutation.isLoading}
+          sx={{ height: "2.5rem" }}
+          variant={"contained"}>
+          {mutation.isLoading ? (
+            <CircularProgress
+              sx={{ width: "100% !important", height: "auto !important" }}
+            />
+          ) : (
+            "Save"
+          )}
+        </Button>
         <Box>
           {isClientBoss ? (
             <List sx={{ display: "flex" }}>
