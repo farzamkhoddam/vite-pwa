@@ -13,12 +13,7 @@ export enum ComponentTypes {
   EMPTY = "EMPTY",
 }
 export enum LocalStorageTypes {
-  DROPPEDITEMS = "DROPPEDITEMS",
-  ROW_NUMBER = "ROW_NUMBER",
-  UIDS = "UIDS",
-  MENU_ITEMS = "MENU_ITEMS",
-  BOX_WIDTH = "BOX_WIDTH",
-  BOX_HEIGHT = "BOX_HEIGHT",
+  USER_KEY = "USER_KEY",
 }
 export interface SubGenre {
   href: string;
@@ -36,4 +31,16 @@ export interface MenuItems {
   variant: "LINK" | "GENRE";
   href?: string;
   genres?: Genre[];
+}
+export interface SignupInterface {
+  Email: string;
+  UserName: string;
+  Password: string;
+}
+export interface UserProfileData {
+  UserName: string;
+  Email: string;
+  UserId: string;
+  exp: number;
+  Roles: string;
 }

@@ -7,7 +7,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { ComponentTypes } from "../Types";
+import { ComponentTypes, LocalStorageTypes } from "../Types";
 import DraggableListItems from "./DraggableListItems";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "react-query";
@@ -15,6 +15,7 @@ import axios from "axios";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { GridContext } from "../Pages/Homepage/Context/GridContext";
+import { GetUserKeyDecoded } from "../utils";
 
 const Menu = () => {
   const [searchParams] = useSearchParams();
@@ -26,11 +27,21 @@ const Menu = () => {
     ComponentTypes.SWITCH,
   ];
   const { uIDs } = useContext(GridContext);
+  console.log("farzam uIDs ===", uIDs);
+  const userProfileData = GetUserKeyDecoded();
   const mutation = useMutation(
     async () => {
       const response = await axios.post(
-        "https://localhost:7215/api/layout",
-        uIDs
+        `https://localhost:7215/api/layout/${userProfileData.UserId}`,
+
+        uIDs,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              LocalStorageTypes.USER_KEY
+            )}`,
+          },
+        }
       );
       return response.data;
     },

@@ -1,3 +1,27 @@
+import { LocalStorageTypes, UserProfileData } from "./Types";
+
+export const GetUserKeyDecoded = () => {
+  function decodeBase64Url(base64Url?: string): UserProfileData {
+    // Convert Base64Url to Base64
+    if(base64Url){
+      const base64 = base64Url?.replace(/-/g, "+")?.replace(/_/g, "/");
+      // Decode Base64 string
+      const base64Padded = base64 + "=".repeat((4 - (base64?.length % 4)) % 4);
+      return JSON.parse(atob(base64Padded));
+
+    }
+    return {} as UserProfileData
+  }
+
+  // Example JWT token
+  const token: string | null = localStorage.getItem(LocalStorageTypes.USER_KEY);
+  // Split the token into its parts
+  const parts = token?.split(".");
+
+  // Decode the payload
+  const payload: UserProfileData = decodeBase64Url(parts?.[1]);
+  return payload;
+};
 export function getFirstDigit(num: number): number {
   // Convert the number to a string
   const strNum = num?.toString();
