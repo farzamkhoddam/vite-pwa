@@ -14,6 +14,11 @@ export enum ComponentTypes {
 }
 export enum LocalStorageTypes {
   USER_KEY = "USER_KEY",
+  USER_REFRESH_KEY = "USER_REFRESH_KEY",
+}
+export enum CookiesTypes {
+  USER_KEY = "USER_KEY",
+  USER_REFRESH_KEY = "USER_REFRESH_KEY",
 }
 export interface SubGenre {
   href: string;
@@ -37,10 +42,18 @@ export interface SignupInterface {
   UserName: string;
   Password: string;
 }
+export interface SigninInterface {
+  UserNameOrEmail: string;
+  Password: string;
+}
 export interface UserProfileData {
   UserName: string;
   Email: string;
   UserId: string;
   exp: number;
   Roles: string;
+}
+export interface AuthResDataType {
+  accessToken: string;
+  refreshToken: string;
 }

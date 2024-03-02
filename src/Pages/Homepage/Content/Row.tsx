@@ -54,6 +54,7 @@ const Row: React.FC<Props> = ({
         ]);
     }
   };
+
   useEffect(() => {
     if (totalColumns === 0 && isVisible) {
       setIsVisible(false);
@@ -79,7 +80,16 @@ const Row: React.FC<Props> = ({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uId, uIDs]);
-
+  useEffect(() => {
+    setTotalColumns(
+      uIDs
+        ?.filter((UID) => {
+          return UID.uId?.toString().length === uIdLength + 1;
+        })
+        .filter((UID) => UID.uId?.toString().startsWith(uId?.toString()))
+        .length || 1
+    );
+  }, [uIDs, setTotalColumns, uId, uIdLength]);
   useEffect(() => {
     if (uIDs && setuIDs && !uIDs.some((item) => item.uId === uId)) {
       setuIDs([...uIDs, { uId }]);

@@ -10,10 +10,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useState } from "react";
-import { LocalStorageTypes, SignupInterface } from "../../Types";
+import { AuthResDataType, CookiesTypes, SignupInterface } from "../../Types";
 import { useMutation } from "react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Signup = () => {
     Email: "",
     Password: "",
   } as SignupInterface);
-  const mutation = useMutation(
+  const mutation = useMutation<AuthResDataType>(
     async () => {
       const response = await axios.post(
         "https://localhost:7215/api/auth/register",
@@ -32,14 +33,22 @@ const Signup = () => {
     },
     {
       onSuccess: (res) => {
-        
-        localStorage.setItem(LocalStorageTypes.USER_KEY, res);
+        Cookies.set(CookiesTypes.USER_KEY, res.accessToken, {
+          secure: true, // Use secure cookies in production
+          sameSite: "strict", // Prevents the cookie from being sent in cross-site requests
+          expires: 7, // Cookie expires after 7 days
+        });
+        Cookies.set(CookiesTypes.USER_REFRESH_KEY, res.refreshToken, {
+          secure: true, // Use secure cookies in production
+          sameSite: "strict", // Prevents the cookie from being sent in cross-site requests
+          expires: 7, // Cookie expires after 7 days
+        });
         navigate("/?boss=true");
       },
       onError: (error) => {
         // @ts-expect-error I dont have the type
         toast.error(error.response.data.error[0]);
-        console.log("farzam error ===", error);
+        console.error(error);
       },
     }
   );

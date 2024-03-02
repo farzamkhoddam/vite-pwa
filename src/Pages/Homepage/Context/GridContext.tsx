@@ -1,8 +1,9 @@
 import { createContext, useEffect, useState } from "react";
-import { ComponentTypes, LocalStorageTypes } from "../../../Types";
+import { ComponentTypes, CookiesTypes } from "../../../Types";
 import axios from "axios";
 import { useQuery } from "react-query";
-import { GetUserKeyDecoded } from "../../../utils";
+
+import Cookies from "js-cookie";
 
 export interface UIDType {
   uId: number;
@@ -14,7 +15,7 @@ export interface UIDType {
   }[];
 }
 interface GridContextType {
-  isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   uIDs?: UIDType[];
   setuIDs?: React.Dispatch<
@@ -34,19 +35,12 @@ interface GridContextType {
 // farzam the user only can make 9 rows currently fix it
 const GridContext = createContext<GridContextType>({} as GridContextType);
 const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const userProfileData = GetUserKeyDecoded();
-
-  const { data, isLoading, isError } = useQuery("getLayoutData", async () => {
-    const response = await axios.get(
-      `https://localhost:7215/api/layout/${userProfileData.UserId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            LocalStorageTypes.USER_KEY
-          )}`,
-        },
-      }
-    );
+  const { data, isError, isFetching } = useQuery("getLayoutData", async () => {
+    const response = await axios.get(`https://localhost:7215/api/layout`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
+      },
+    });
     return response.data;
   });
   const [uIDs, setuIDs] = useState<UIDType[]>(data);
@@ -63,7 +57,7 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         uIDs,
         setuIDs,
-        isLoading,
+        isFetching,
         isError,
       }}>
       {children}

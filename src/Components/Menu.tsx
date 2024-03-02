@@ -7,7 +7,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { ComponentTypes, LocalStorageTypes } from "../Types";
+import { ComponentTypes, CookiesTypes } from "../Types";
 import DraggableListItems from "./DraggableListItems";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "react-query";
@@ -15,7 +15,7 @@ import axios from "axios";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { GridContext } from "../Pages/Homepage/Context/GridContext";
-import { GetUserKeyDecoded } from "../utils";
+import Cookies from "js-cookie";
 
 const Menu = () => {
   const [searchParams] = useSearchParams();
@@ -27,19 +27,16 @@ const Menu = () => {
     ComponentTypes.SWITCH,
   ];
   const { uIDs } = useContext(GridContext);
-  console.log("farzam uIDs ===", uIDs);
-  const userProfileData = GetUserKeyDecoded();
+  
   const mutation = useMutation(
     async () => {
       const response = await axios.post(
-        `https://localhost:7215/api/layout/${userProfileData.UserId}`,
+        `https://localhost:7215/api/layout`,
 
         uIDs,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              LocalStorageTypes.USER_KEY
-            )}`,
+            Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
           },
         }
       );
@@ -54,7 +51,16 @@ const Menu = () => {
       },
     }
   );
-
+  function handleLogout() {
+    try {
+     Cookies.remove(CookiesTypes.USER_KEY);
+     Cookies.remove(CookiesTypes.USER_REFRESH_KEY);
+      toast.success("Successfully logged out!");
+      window.location.reload();
+    } catch (err) {
+      toast.error("something went wrong!");
+    }
+  }
   return (
     <AppBar sx={{ zIndex: 999999 }} position="fixed">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -78,6 +84,19 @@ const Menu = () => {
           ) : (
             "Save"
           )}
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          sx={{
+            transition: "0.3s",
+            "&:hover": {
+              boxShadow: "0 8px 16px rgba(0,0,0,0.2)", // This creates the elevation effect on hover
+              transform: "translateY(-2px)", // Optional: Move the button up slightly on hover
+            },
+          }}
+          onClick={handleLogout}>
+          Logout
         </Button>
         <Box>
           {isClientBoss ? (

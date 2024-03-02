@@ -1,4 +1,5 @@
-import { LocalStorageTypes, UserProfileData } from "./Types";
+import {  CookiesTypes, UserProfileData } from "./Types";
+import Cookies from "js-cookie";
 
 export const GetUserKeyDecoded = () => {
   function decodeBase64Url(base64Url?: string): UserProfileData {
@@ -14,7 +15,7 @@ export const GetUserKeyDecoded = () => {
   }
 
   // Example JWT token
-  const token: string | null = localStorage.getItem(LocalStorageTypes.USER_KEY);
+  const token: string | undefined = Cookies.get(CookiesTypes.USER_KEY) ;
   // Split the token into its parts
   const parts = token?.split(".");
 
