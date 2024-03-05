@@ -156,7 +156,7 @@ const Row: React.FC<Props> = ({
               bottom: "0",
               left: "50%",
               transform: "translate(-50%,50%)",
-              zIndex: 999999,
+              zIndex: 90,
             }}
             onClick={handleAddButtonClick}>
             <ControlPointOutlinedIcon fontSize="large" />

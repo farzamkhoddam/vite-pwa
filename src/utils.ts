@@ -1,21 +1,20 @@
-import {  CookiesTypes, UserProfileData } from "./Types";
+import { CookiesTypes, UserProfileData } from "./Types";
 import Cookies from "js-cookie";
 
 export const GetUserKeyDecoded = () => {
   function decodeBase64Url(base64Url?: string): UserProfileData {
     // Convert Base64Url to Base64
-    if(base64Url){
+    if (base64Url) {
       const base64 = base64Url?.replace(/-/g, "+")?.replace(/_/g, "/");
       // Decode Base64 string
       const base64Padded = base64 + "=".repeat((4 - (base64?.length % 4)) % 4);
       return JSON.parse(atob(base64Padded));
-
     }
-    return {} as UserProfileData
+    return {} as UserProfileData;
   }
 
   // Example JWT token
-  const token: string | undefined = Cookies.get(CookiesTypes.USER_KEY) ;
+  const token: string | undefined = Cookies.get(CookiesTypes.USER_KEY);
   // Split the token into its parts
   const parts = token?.split(".");
 

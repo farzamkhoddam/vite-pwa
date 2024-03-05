@@ -25,20 +25,23 @@ const Menu = () => {
     ComponentTypes.INPUT,
     ComponentTypes.RATING,
     ComponentTypes.SWITCH,
+    ComponentTypes.SLIDER,
   ];
   const { uIDs } = useContext(GridContext);
-  
+  const headers = Cookies.get(CookiesTypes.USER_KEY)
+    ? {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
+        },
+      }
+    : {};
   const mutation = useMutation(
     async () => {
       const response = await axios.post(
         `https://localhost:7215/api/layout`,
 
         uIDs,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
-          },
-        }
+        headers
       );
       return response.data;
     },
@@ -53,8 +56,8 @@ const Menu = () => {
   );
   function handleLogout() {
     try {
-     Cookies.remove(CookiesTypes.USER_KEY);
-     Cookies.remove(CookiesTypes.USER_REFRESH_KEY);
+      Cookies.remove(CookiesTypes.USER_KEY);
+      Cookies.remove(CookiesTypes.USER_REFRESH_KEY);
       toast.success("Successfully logged out!");
       window.location.reload();
     } catch (err) {

@@ -8,10 +8,12 @@ import {
   styled,
 } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { ComponentTypes, ItemType } from "../Types";
+import { ClientSlider_Cards, ComponentTypes, ItemType } from "../Types";
 import ClientMenu from "../ClientComponents/ClientMenu";
 import { useDrag, useDrop } from "react-dnd";
 import { useRef } from "react";
+import Slider from "@/ClientComponents/Slider";
+
 interface Props {
   componentName: ComponentTypes | null;
   index?: number;
@@ -27,6 +29,7 @@ interface Props {
   >;
   componentID?: string;
   uId?: number;
+  componentData?:ClientSlider_Cards[];
 }
 
 export default function ComponentLauncher({
@@ -36,6 +39,7 @@ export default function ComponentLauncher({
   setDroppedItems,
   componentID,
   canEdit = false,
+  componentData,
   uId,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -91,16 +95,19 @@ export default function ComponentLauncher({
       item.index = hoverIndex;
     },
   });
+
   // eslint-disable-next-line no-empty-pattern
   const [{}, drag] = useDrag(
     () => ({
       type: ItemType.componentLauncherItem,
       canDrag: canEdit,
       item: () => {
+        
         return {
           index,
           name: componentName,
           componentID: componentID,
+          componentData: componentData,
           currentParentUId: uId,
           setOriginalColumnDroppedItems: setDroppedItems,
         };
@@ -109,7 +116,7 @@ export default function ComponentLauncher({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [componentID, componentName, index, canEdit]
+    [componentID, componentName, index, canEdit, componentData]
   );
   drag(drop(ref));
   switch (componentName) {
@@ -152,8 +159,12 @@ export default function ComponentLauncher({
     case ComponentTypes.SLIDER:
       return (
         <StyledBox canEdit={canEdit} ref={ref}>
-          {canEdit && <DragIcon />}
-          <Switch />
+          {canEdit && <DragIcon />}{" "}
+          <Slider
+            componentData={componentData}
+            componentId={componentID || ""}
+            uId={uId || 0}
+          />
         </StyledBox>
       );
     case ComponentTypes.NEWS:
@@ -173,6 +184,8 @@ const StyledBox = styled(Box, {
   border: canEdit ? "1px solid" : "unset",
   cursor: canEdit ? "grab" : "unset",
   position: "relative",
+  overflow: "hidden",
+  margin: "1rem",
 }));
 const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
   background: theme.palette.primary.dark,
@@ -181,6 +194,6 @@ const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
   top: "50%",
   left: 0,
   transform: "translate(-100%,-50%)",
-  zIndex: "50000",
+  zIndex: "99",
   width: "1rem",
 }));

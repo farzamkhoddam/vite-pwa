@@ -1,5 +1,9 @@
 import { createContext, useEffect, useState } from "react";
-import { ComponentTypes, CookiesTypes } from "../../../Types";
+import {
+  ClientSlider_Cards,
+  ComponentTypes,
+  CookiesTypes,
+} from "../../../Types";
 import axios from "axios";
 import { useQuery } from "react-query";
 
@@ -12,6 +16,7 @@ export interface UIDType {
   components?: {
     name: ComponentTypes;
     componentID: string;
+    componentData?: ClientSlider_Cards[];
   }[];
 }
 interface GridContextType {
@@ -27,6 +32,7 @@ interface GridContextType {
         components?: {
           name: ComponentTypes;
           componentID: string;
+          componentData?: ClientSlider_Cards[];
         }[];
       }[]
     >
@@ -35,14 +41,30 @@ interface GridContextType {
 // farzam the user only can make 9 rows currently fix it
 const GridContext = createContext<GridContextType>({} as GridContextType);
 const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const { data, isError, isFetching } = useQuery("getLayoutData", async () => {
-    const response = await axios.get(`https://localhost:7215/api/layout`, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
-      },
-    });
-    return response.data;
-  });
+  const [shouldFetch, setShouldFetch] = useState(true);
+
+  useEffect(() => {
+    // Change the state to true after the component mounts
+    setShouldFetch(false);
+  }, []);
+  const headers = Cookies.get(CookiesTypes.USER_KEY)
+    ? {
+        headers: {
+          Authorization: `Bearer ${Cookies.get(CookiesTypes.USER_KEY)}`,
+        },
+      }
+    : {};
+  const { data, isError, isFetching } = useQuery(
+    "getLayoutData",
+    async () => {
+      const response = await axios.get(
+        `https://localhost:7215/api/layout`,
+        headers
+      );
+      return response.data;
+    },
+    { enabled: shouldFetch }
+  );
   const [uIDs, setuIDs] = useState<UIDType[]>(data);
   useEffect(() => {
     setuIDs(data);

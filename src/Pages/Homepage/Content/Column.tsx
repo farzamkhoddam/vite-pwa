@@ -5,8 +5,8 @@ import { GridContext } from "../Context/GridContext";
 import React from "react";
 import Row from "./Row";
 import { useDrop } from "react-dnd";
-import { ComponentTypes, ItemType } from "../../../Types";
-import ComponentLauncher from "../../../Components/ComponentLauncher";
+import { ClientSlider_Cards, ComponentTypes, ItemType } from "../../../Types";
+import ComponentLauncher from "../../../Component/ComponentLauncher";
 import { useSearchParams } from "react-router-dom";
 import interact from "interactjs";
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
@@ -18,6 +18,7 @@ interface ItemTypes {
   name: ComponentTypes;
   index: number;
   componentID: string;
+  componentData?: ClientSlider_Cards[];
   currentParentUId: number;
   setOriginalColumnDroppedItems: React.Dispatch<
     React.SetStateAction<
@@ -45,9 +46,12 @@ const Column: React.FC<Props> = ({
   //
   const { uIDs, setuIDs } = React.useContext(GridContext);
   const uIdIndex = uIDs?.findIndex((item) => item.uId === uId) || 0;
-
   const [droppedItems, setDroppedItems] = useState<
-    { name: ComponentTypes; componentID: string }[]
+    {
+      name: ComponentTypes;
+      componentID: string;
+      componentData?: ClientSlider_Cards[];
+    }[]
   >(
     uIDs?.[uIdIndex]?.components ||
       ([] as { name: ComponentTypes; componentID: string }[])
@@ -144,13 +148,22 @@ const Column: React.FC<Props> = ({
         if (item.index === undefined) {
           setDroppedItems((prevItems) => [
             ...prevItems,
-            { name: item.name, componentID: shortid.generate() },
+            {
+              name: item.name,
+              componentID: shortid.generate(),
+              componentData: item?.componentData,
+            },
           ]);
         }
         if (item.componentID) {
+          
           setDroppedItems((prevItems) => [
             ...prevItems,
-            { name: item.name, componentID: item.componentID },
+            {
+              name: item.name,
+              componentID: item.componentID,
+              componentData: item.componentData,
+            },
           ]);
           // we need to delete the component from the original column
           // we do not need duplicates
@@ -175,24 +188,29 @@ const Column: React.FC<Props> = ({
     setDroppedItems([]);
   }
   useEffect(() => {
-    if ( uIDs) {
+    if (uIDs) {
       const uIdIndex = uIDs?.findIndex((item) => {
-       return item.uId === uId;
+        return item.uId === uId;
       });
       if (uIdIndex !== -1) {
-      // Clone the item to avoid direct mutation
-      const updatedItem = { ...uIDs[uIdIndex], components: droppedItems };
-      // Update the state with the new item
-     setuIDs && setuIDs((prevState) => {
-        // Create a shallow copy of the previous state
-        const newState = [...prevState];
-        // Replace the item at the found index with the updated item
-        newState[uIdIndex] = updatedItem;
-        // Return the new state
-        return newState;
-      });
-      
-    }}
+        
+        // Clone the item to avoid direct mutation
+        const updatedItem = {
+          ...uIDs[uIdIndex],
+          components: droppedItems,
+        };
+        // Update the state with the new item
+        setuIDs &&
+          setuIDs((prevState) => {
+            // Create a shallow copy of the previous state
+            const newState = [...prevState];
+            // Replace the item at the found index with the updated item
+            newState[uIdIndex] = updatedItem;
+            // Return the new state
+            return newState;
+          });
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedItems, uId]);
   //
@@ -233,7 +251,10 @@ const Column: React.FC<Props> = ({
         ref={drop}
         {...refProps}
         sx={{
-          width: initialWidth !== null ? `${initialWidth}px` : 100 / widthDivider + "%",
+          width:
+            initialWidth !== null
+              ? `${initialWidth}px`
+              : 100 / widthDivider + "%",
           minWidth: "100px",
           height: 1,
           p: 3,
@@ -263,6 +284,7 @@ const Column: React.FC<Props> = ({
             uId={uId}
             setDroppedItems={setDroppedItems}
             componentID={droppedItem.componentID}
+            componentData={droppedItem.componentData}
             componentName={droppedItem.name || ComponentTypes.EMPTY}
             canEdit={isClientBoss ? true : false}
           />
@@ -291,6 +313,7 @@ const Column: React.FC<Props> = ({
               position: "absolute",
               top: 0,
               left: "50%",
+              zIndex: 100,
               transform: "translateX(-50%)",
               display: "flex",
               justifyContent: "center",

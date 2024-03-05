@@ -57,8 +57,8 @@ function App() {
   function handleUnauthorized(error: AxiosError) {
     if (
       error.response &&
-      error.response.status === 401 &&
-      !!Cookies.get(CookiesTypes.USER_REFRESH_KEY)
+      error.response.status === 401 
+      
     ) {
       mutation.mutate()
     }

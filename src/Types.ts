@@ -8,18 +8,16 @@ export enum ComponentTypes {
   RATING = "Rating",
   SWITCH = "Switch",
   MENU = "MENU",
-  SLIDER = "SLIDER",
+  SLIDER = "Slider",
   NEWS = "NEWS",
   EMPTY = "EMPTY",
 }
-export enum LocalStorageTypes {
-  USER_KEY = "USER_KEY",
-  USER_REFRESH_KEY = "USER_REFRESH_KEY",
-}
+
 export enum CookiesTypes {
   USER_KEY = "USER_KEY",
   USER_REFRESH_KEY = "USER_REFRESH_KEY",
 }
+// Client Menu Types
 export interface SubGenre {
   href: string;
   text: string;
@@ -30,13 +28,16 @@ export interface Genre {
   variant: "LINK" | "GENRE";
   subGenres?: SubGenre[];
 }
-
+// Menu Types
 export interface MenuItems {
   text: string;
   variant: "LINK" | "GENRE";
   href?: string;
   genres?: Genre[];
 }
+
+// Identification Types
+
 export interface SignupInterface {
   Email: string;
   UserName: string;
@@ -53,7 +54,17 @@ export interface UserProfileData {
   exp: number;
   Roles: string;
 }
+//
+
+// Auth Types
 export interface AuthResDataType {
   accessToken: string;
   refreshToken: string;
+}
+
+// Client Slider
+export interface ClientSlider_Cards {
+  title: string;
+  desc: string;
+  image: string;
 }
