@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import {
-  ClientSlider_Cards,
+  ComponentDataTypes,
   ComponentTypes,
   CookiesTypes,
 } from "../../../Types";
@@ -16,7 +16,7 @@ export interface UIDType {
   components?: {
     name: ComponentTypes;
     componentID: string;
-    componentData?: ClientSlider_Cards[];
+    componentData?: ComponentDataTypes;
   }[];
 }
 interface GridContextType {
@@ -32,11 +32,21 @@ interface GridContextType {
         components?: {
           name: ComponentTypes;
           componentID: string;
-          componentData?: ClientSlider_Cards[];
+          componentData?: ComponentDataTypes;
         }[];
       }[]
     >
   >;
+}
+interface ServerLayoutType {
+  uId: number;
+  width?: number;
+  height?: number;
+  components?: {
+    name: ComponentTypes;
+    componentID: string;
+    componentDatas?: string;
+  }[];
 }
 // farzam the user only can make 9 rows currently fix it
 const GridContext = createContext<GridContextType>({} as GridContextType);
@@ -54,25 +64,46 @@ const GridContextProvider = ({ children }: { children: React.ReactNode }) => {
         },
       }
     : {};
-  const { data, isError, isFetching } = useQuery(
+  const { data, isError, isFetching } = useQuery<ServerLayoutType[]>(
     "getLayoutData",
     async () => {
       const response = await axios.get(
         `https://localhost:7215/api/layout`,
         headers
       );
+
       return response.data;
     },
     { enabled: shouldFetch }
   );
-  const [uIDs, setuIDs] = useState<UIDType[]>(data);
+  const fromattedData = data?.map((item) => {
+    return {
+      uId: item.uId,
+      width: item.width,
+      height: item.height,
+      components: item.components?.map((component) => {
+        return {
+          name: component.name,
+          componentID: component.componentID,
+          componentData: JSON.parse(component.componentDatas || "[]"),
+        };
+      }),
+    };
+  });
+  const [uIDs, setuIDs] = useState<UIDType[]>(
+    fromattedData || ([] as UIDType[])
+  );
   useEffect(() => {
-    setuIDs(data);
+    if (fromattedData) {
+      setuIDs(fromattedData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   useEffect(() => {
     if (uIDs?.length === 0) {
       setuIDs([{ uId: 1 }]);
     }
+    console.log("farzam uid ===", uIDs);
   }, [uIDs]);
   return (
     <GridContext.Provider

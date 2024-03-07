@@ -8,7 +8,7 @@ import {
   styled,
 } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { ClientSlider_Cards, ComponentTypes, ItemType } from "../Types";
+import { ComponentDataTypes, ComponentTypes, ItemType } from "../Types";
 import ClientMenu from "../ClientComponents/ClientMenu";
 import { useDrag, useDrop } from "react-dnd";
 import { useRef } from "react";
@@ -29,7 +29,7 @@ interface Props {
   >;
   componentID?: string;
   uId?: number;
-  componentData?:ClientSlider_Cards[];
+  componentData?: ComponentDataTypes;
 }
 
 export default function ComponentLauncher({
@@ -102,7 +102,6 @@ export default function ComponentLauncher({
       type: ItemType.componentLauncherItem,
       canDrag: canEdit,
       item: () => {
-        
         return {
           index,
           name: componentName,
@@ -151,10 +150,14 @@ export default function ComponentLauncher({
       );
     case ComponentTypes.MENU:
       return (
-        <StyledBox canEdit={canEdit} ref={ref}>
+        <MenuContainer canEdit={canEdit} ref={ref}>
           {canEdit && <DragIcon />}
-          <ClientMenu />{" "}
-        </StyledBox>
+          <ClientMenu
+            componentData={componentData}
+            componentId={componentID || ""}
+            uId={uId || 0}
+          />{" "}
+        </MenuContainer>
       );
     case ComponentTypes.SLIDER:
       return (
@@ -184,6 +187,14 @@ const StyledBox = styled(Box, {
   border: canEdit ? "1px solid" : "unset",
   cursor: canEdit ? "grab" : "unset",
   position: "relative",
+  overflow: "hidden",
+  margin: "1rem",
+}));
+const MenuContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== "canEdit",
+})<{ canEdit: boolean }>(({ canEdit }) => ({
+  border: canEdit ? "1px solid" : "unset",
+  cursor: canEdit ? "grab" : "unset",
   overflow: "hidden",
   margin: "1rem",
 }));

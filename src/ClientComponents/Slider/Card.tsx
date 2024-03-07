@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import styled from "@emotion/styled";
 import EditOrAddDialog from "./Dialog/EditOrAddDialog";
 import DeleteDialog from "./Dialog/DeleteDialog";
+import { IsClientBoss } from "@/utils";
 
 interface Props {
   setCards: React.Dispatch<React.SetStateAction<ClientSlider_Cards[]>>;
@@ -22,7 +23,7 @@ interface Props {
 const CardComponent: React.FC<Props> = ({ card, index, setCards }) => {
   const [openEditDialog, setOpenEditDialog] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
-
+  const isClientBoss = IsClientBoss();
   function OnDialogSave({
     titleValue,
     descValue,
@@ -75,7 +76,9 @@ const CardComponent: React.FC<Props> = ({ card, index, setCards }) => {
         onDelete={DeleteCard}
       />
       {/*  */}
-      <Card onClick={() => setOpenEditDialog(true)} sx={{ width: "17rem" }}>
+      <Card
+        onClick={() => isClientBoss && setOpenEditDialog(true)}
+        sx={{ width: "17rem" }}>
         <CardMedia
           sx={{ height: 140 }}
           image={card.image || ""}
@@ -91,21 +94,23 @@ const CardComponent: React.FC<Props> = ({ card, index, setCards }) => {
             {card.desc}
           </Desc>
         </CardContent>
-        <CardActions>
-          <Button size="small" startIcon={<ModeEditIcon />}>
-            Edit
-          </Button>
-          <Button
-            startIcon={<DeleteIcon />}
-            color="error"
-            onClick={(event) => {
-              event.stopPropagation();
-              setOpenDeleteDialog(true);
-            }}
-            size="small">
-            Delete
-          </Button>
-        </CardActions>
+        {isClientBoss && (
+          <CardActions>
+            <Button size="small" startIcon={<ModeEditIcon />}>
+              Edit
+            </Button>
+            <Button
+              startIcon={<DeleteIcon />}
+              color="error"
+              onClick={(event) => {
+                event.stopPropagation();
+                setOpenDeleteDialog(true);
+              }}
+              size="small">
+              Delete
+            </Button>
+          </CardActions>
+        )}
       </Card>
     </>
   );

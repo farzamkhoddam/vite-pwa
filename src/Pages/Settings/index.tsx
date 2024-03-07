@@ -1,16 +1,17 @@
 import Box from "@mui/material/Box";
 import ListDrawer from "./ListDrawer";
-import { useSearchParams } from "react-router-dom";
+
 import { useState } from "react";
 import { ComponentTypes } from "../../Types";
 import ComponentLauncher from "../../Component/ComponentLauncher";
+import { IsClientBoss } from "@/utils";
 
 export default function ClientPage() {
-  const [searchParams] = useSearchParams();
   const [selectedComponent, setSelectedComponent] = useState<ComponentTypes>(
     ComponentTypes.EMPTY
   );
-  if (searchParams.get("boss") === "true") {
+  const isClientBoss = IsClientBoss();
+  if (isClientBoss) {
     return (
       <Box sx={{ display: "flex", width: 1, height: 1 }}>
         <ListDrawer setSelectedComponent={setSelectedComponent} />

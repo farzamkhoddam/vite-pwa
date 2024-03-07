@@ -6,29 +6,30 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import { useContext, useEffect, useState } from "react";
-import { ClientSlider_Cards } from "@/Types";
+import { ClientSlider_Cards, ComponentDataTypes } from "@/Types";
 import CardComponent from "./Card";
 import { Box, styled } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import EditOrAddDialog from "./Dialog/EditOrAddDialog";
 import { GridContext } from "@/Pages/Homepage/Context/GridContext";
+import { IsClientBoss } from "@/utils";
 interface Props {
   componentId: string;
   uId: number;
-  componentData?: ClientSlider_Cards[];
+  componentData?: ComponentDataTypes;
 }
 const Slider: React.FC<Props> = ({ componentId, uId, componentData }) => {
   const { uIDs, setuIDs } = useContext(GridContext);
 
   const [cards, setCards] = useState<ClientSlider_Cards[]>(
-    componentData || ([] as ClientSlider_Cards[])
+    componentData as ClientSlider_Cards[] || ([] as ClientSlider_Cards[])
   );
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const handleAddButtonClicked = () => {
     setOpenDialog((prevState) => !prevState);
   };
-
+  const isClientBoss = IsClientBoss();
   const handleAddCard = ({
     titleValue,
     descValue,
@@ -74,6 +75,7 @@ const Slider: React.FC<Props> = ({ componentId, uId, componentData }) => {
         return [...updatedUIDs];
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards]);
   return (
     <>
@@ -94,31 +96,33 @@ const Slider: React.FC<Props> = ({ componentId, uId, componentData }) => {
             </StyledSwiperSlide>
           );
         })}
-        <StyledSwiperSlide>
-          <Box
-            onClick={handleAddButtonClicked}
-            sx={{
-              width: "100%",
-              height: 140,
-              maxWidth: 345,
+        {isClientBoss && (
+          <StyledSwiperSlide>
+            <Box
+              onClick={handleAddButtonClicked}
+              sx={{
+                width: "100%",
+                height: 140,
+                maxWidth: 345,
 
-              backdropFilter: "blur(10px)",
-              borderRadius: "10px",
-              overflow: "hidden",
-              border: "2px dashed ",
-              borderColor: grey[700],
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-              fontSize: "24px",
-              fontWeight: "bold",
-            }}>
-            <AddCircleOutlineOutlinedIcon
-              sx={{ width: "2rem", height: "auto" }}
-            />
-          </Box>
-        </StyledSwiperSlide>
+                backdropFilter: "blur(10px)",
+                borderRadius: "10px",
+                overflow: "hidden",
+                border: "2px dashed ",
+                borderColor: grey[700],
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: "24px",
+                fontWeight: "bold",
+              }}>
+              <AddCircleOutlineOutlinedIcon
+                sx={{ width: "2rem", height: "auto" }}
+              />
+            </Box>
+          </StyledSwiperSlide>
+        )}
       </StyledSwiper>
     </>
   );

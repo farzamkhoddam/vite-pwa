@@ -5,20 +5,21 @@ import { GridContext } from "../Context/GridContext";
 import React from "react";
 import Row from "./Row";
 import { useDrop } from "react-dnd";
-import { ClientSlider_Cards, ComponentTypes, ItemType } from "../../../Types";
+import { ComponentDataTypes, ComponentTypes, ItemType } from "../../../Types";
 import ComponentLauncher from "../../../Component/ComponentLauncher";
-import { useSearchParams } from "react-router-dom";
+
 import interact from "interactjs";
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import SortIcon from "@mui/icons-material/Sort";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import shortid from "shortid";
+import { IsClientBoss } from "@/utils";
 
 interface ItemTypes {
   name: ComponentTypes;
   index: number;
   componentID: string;
-  componentData?: ClientSlider_Cards[];
+  componentData?: ComponentDataTypes;
   currentParentUId: number;
   setOriginalColumnDroppedItems: React.Dispatch<
     React.SetStateAction<
@@ -50,14 +51,14 @@ const Column: React.FC<Props> = ({
     {
       name: ComponentTypes;
       componentID: string;
-      componentData?: ClientSlider_Cards[];
+      componentData?: ComponentDataTypes;
     }[]
   >(
     uIDs?.[uIdIndex]?.components ||
       ([] as { name: ComponentTypes; componentID: string }[])
   );
-  const [searchParams] = useSearchParams();
-  const isClientBoss = searchParams.get("boss") === "true";
+
+  const isClientBoss = IsClientBoss();
   const uIdLength = uId?.toString().length;
 
   const [isVisible, setIsVisible] = useState(true);
@@ -156,7 +157,6 @@ const Column: React.FC<Props> = ({
           ]);
         }
         if (item.componentID) {
-          
           setDroppedItems((prevItems) => [
             ...prevItems,
             {
@@ -193,7 +193,6 @@ const Column: React.FC<Props> = ({
         return item.uId === uId;
       });
       if (uIdIndex !== -1) {
-        
         // Clone the item to avoid direct mutation
         const updatedItem = {
           ...uIDs[uIdIndex],
@@ -214,7 +213,7 @@ const Column: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedItems, uId]);
   //
-
+  const zIndex = uId?.toString().length;
   // resize
   const [initialWidth, setInitialWidth] = useState(uIDs?.[uIdIndex]?.width);
   interact(`.column-${uId}`).resizable({
@@ -259,14 +258,13 @@ const Column: React.FC<Props> = ({
           height: 1,
           p: 3,
           display: "flex",
-
+          position: "relative",
           flexGrow: initialWidth ? 0 : 1,
           flexShrink: initialWidth ? 1 : 100,
           justifyContent: droppedItems.length !== 0 ? "center" : "unset",
           alignItems: droppedItems.length !== 0 ? "center" : "unset",
           flexWrap: droppedItems.length !== 0 ? "wrap" : "unset",
           flexDirection: "column",
-          position: "relative",
           borderRight: isClientBoss ? "1px solid" : "0px",
           borderColor: "gray",
           "&:hover": {
@@ -313,7 +311,7 @@ const Column: React.FC<Props> = ({
               position: "absolute",
               top: 0,
               left: "50%",
-              zIndex: 100,
+              zIndex: 1000,
               transform: "translateX(-50%)",
               display: "flex",
               justifyContent: "center",
@@ -359,7 +357,7 @@ const Column: React.FC<Props> = ({
               top: "50%",
               right: "0",
               transform: "translate(50%, -50%)",
-              zIndex: uId?.toString().length,
+              zIndex: zIndex,
             }}>
             <ControlPointOutlinedIcon fontSize="large" color={"primary"} />
           </IconButton>

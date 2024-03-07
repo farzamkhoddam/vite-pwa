@@ -4,8 +4,9 @@ import Column from "./Column";
 import ControlPointOutlinedIcon from "@mui/icons-material/ControlPointOutlined";
 import { GridContext } from "../Context/GridContext";
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+
 import interact from "interactjs";
+import { IsClientBoss } from "@/utils";
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   uId: number;
@@ -21,8 +22,7 @@ const Row: React.FC<Props> = ({
   variant = "normal",
   rows,
 }) => {
-  const [searchParams] = useSearchParams();
-  const isClientBoss = searchParams.get("boss") === "true";
+  const isClientBoss = IsClientBoss();
   const { uIDs, setuIDs } = React.useContext(GridContext);
   const uIdLength: number = uId?.toString().length;
   const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -88,6 +88,9 @@ const Row: React.FC<Props> = ({
         })
         .filter((UID) => UID.uId?.toString().startsWith(uId?.toString()))
         .length || 1
+    );
+    setInitialHeight(
+      `${uIDs?.filter((item) => item.uId === uId)[0]?.height}px`
     );
   }, [uIDs, setTotalColumns, uId, uIdLength]);
   useEffect(() => {

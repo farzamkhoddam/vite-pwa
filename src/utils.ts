@@ -1,6 +1,10 @@
+import { useSearchParams } from "react-router-dom";
 import { CookiesTypes, UserProfileData } from "./Types";
 import Cookies from "js-cookie";
-
+export const IsClientBoss = () => {
+  const [searchParams] = useSearchParams();
+  return searchParams.get("boss") === "true";
+};
 export const GetUserKeyDecoded = () => {
   function decodeBase64Url(base64Url?: string): UserProfileData {
     // Convert Base64Url to Base64

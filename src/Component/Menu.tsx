@@ -9,25 +9,36 @@ import {
 } from "@mui/material";
 import { ComponentTypes, CookiesTypes } from "../Types";
 import DraggableListItems from "./DraggableListItems";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMutation } from "react-query";
 import axios from "axios";
 import { useContext } from "react";
 import toast from "react-hot-toast";
 import { GridContext } from "../Pages/Homepage/Context/GridContext";
 import Cookies from "js-cookie";
+import { IsClientBoss } from "@/utils";
 
 const Menu = () => {
-  const [searchParams] = useSearchParams();
-  const isClientBoss = searchParams.get("boss") === "true";
+  const isClientBoss = IsClientBoss();
   const listItems = [
     ComponentTypes.BUTTON,
     ComponentTypes.INPUT,
     ComponentTypes.RATING,
-    ComponentTypes.SWITCH,
     ComponentTypes.SLIDER,
+    ComponentTypes.MENU,
   ];
   const { uIDs } = useContext(GridContext);
+  const formattedUIDs = uIDs?.map((item) => {
+    return {
+      ...item,
+      components: item.components?.map((component) => {
+        return {
+          ...component,
+          componentDatas: JSON.stringify(component.componentData),
+        };
+      }),
+    };
+  });
   const headers = Cookies.get(CookiesTypes.USER_KEY)
     ? {
         headers: {
@@ -40,7 +51,7 @@ const Menu = () => {
       const response = await axios.post(
         `https://localhost:7215/api/layout`,
 
-        uIDs,
+        formattedUIDs,
         headers
       );
       return response.data;

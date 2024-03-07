@@ -17,6 +17,10 @@ export enum CookiesTypes {
   USER_KEY = "USER_KEY",
   USER_REFRESH_KEY = "USER_REFRESH_KEY",
 }
+export enum MenuVariantTypes {
+  GENRE = "GENRE",
+  LINK = "LINK",
+}
 // Client Menu Types
 export interface SubGenre {
   href: string;
@@ -25,13 +29,13 @@ export interface SubGenre {
 export interface Genre {
   text: string;
   href?: string;
-  variant: "LINK" | "GENRE";
+  variant: MenuVariantTypes;
   subGenres?: SubGenre[];
 }
 // Menu Types
 export interface MenuItems {
   text: string;
-  variant: "LINK" | "GENRE";
+  variant: MenuVariantTypes;
   href?: string;
   genres?: Genre[];
 }
@@ -68,3 +72,4 @@ export interface ClientSlider_Cards {
   desc: string;
   image: string;
 }
+export type ComponentDataTypes = ClientSlider_Cards[] | MenuItems[];

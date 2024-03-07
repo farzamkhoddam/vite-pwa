@@ -70,7 +70,7 @@ const EditOrAddDialog: React.FC<Props> = ({
         <TextField
           autoFocus
           margin="dense"
-          label="Input 1"
+          label="Title"
           type="text"
           fullWidth
           value={titleInput}
@@ -78,7 +78,7 @@ const EditOrAddDialog: React.FC<Props> = ({
         />
         <TextField
           margin="dense"
-          label="Input 2"
+          label="Description"
           type="text"
           fullWidth
           value={descInput}

@@ -3,20 +3,19 @@ import { Box, CircularProgress } from "@mui/material";
 import { GridContext } from "../Context/GridContext";
 import React, { useEffect, useState } from "react";
 import Menu from "../../../Component/Menu";
-import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { CookiesTypes } from "../../../Types";
 import Cookies from "js-cookie";
-
+import { IsClientBoss } from "@/utils";
 
 export default function BossPage() {
   const { uIDs, isFetching, isError } = React.useContext(GridContext);
   const [uIdRows, setUIdRows] = useState(
     uIDs?.filter((item) => item.uId?.toString().length === 1)
   );
-  const [searchParams] = useSearchParams();
+
   const isUserVerified = Cookies.get(CookiesTypes.USER_KEY);
-  const isClientBoss = searchParams.get("boss") === "true";
+  const isClientBoss = IsClientBoss();
 
   useEffect(() => {
     if (!isUserVerified) {
