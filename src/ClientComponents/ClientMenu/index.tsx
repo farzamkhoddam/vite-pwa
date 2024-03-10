@@ -121,6 +121,9 @@ const ClientMenu: React.FC<Props> = ({ componentId, uId, componentData }) => {
                 item.variant === "LINK" ? (
                   <ListItem key={i}>
                     <Link
+                      onClick={(event) => {
+                        event.stopPropagation();
+                      }}
                       href={item?.href}
                       sx={{ cursor: "pointer" }}
                       underline="none">
@@ -129,6 +132,9 @@ const ClientMenu: React.FC<Props> = ({ componentId, uId, componentData }) => {
                   </ListItem>
                 ) : (
                   <GenreComponent
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
                     text={item.text}
                     subGenres={item?.genres || ([] as Genre[])}
                   />

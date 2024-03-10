@@ -87,7 +87,6 @@ const CardComponent: React.FC<Props> = ({ card, index, setCards }) => {
 
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {index}
             {card.title}
           </Typography>
           <Desc variant="body2" color="text.secondary">

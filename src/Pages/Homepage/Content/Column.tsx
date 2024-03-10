@@ -112,6 +112,12 @@ const Column: React.FC<Props> = ({
   }
   //
   useEffect(() => {
+    setDroppedItems(
+      uIDs?.[uIdIndex]?.components ||
+        ([] as { name: ComponentTypes; componentID: string }[])
+    );
+  }, [uIDs, setDroppedItems, uIdIndex]);
+  useEffect(() => {
     if (uIDs && setuIDs && !uIDs.some((id) => id.uId === uId) && isVisible) {
       setuIDs([...uIDs, { uId: uId }]);
     }

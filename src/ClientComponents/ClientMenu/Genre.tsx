@@ -1,14 +1,14 @@
-import { ListItem, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, ListItem, Menu, MenuItem, Typography } from "@mui/material";
 import { Genre, SubGenre } from "../../Types";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
+import { HTMLAttributes, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SubGenreComponent from "./SubGenre";
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   text: string;
   subGenres: Genre[];
 }
-const GenreComponent: React.FC<Props> = ({ text, subGenres }) => {
+const GenreComponent: React.FC<Props> = ({ text, subGenres, ...props }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const GenreComponent: React.FC<Props> = ({ text, subGenres }) => {
     setAnchorEl(null);
   };
   return (
-    <>
+    <Box {...props}>
       <ListItem
         id={`${text}-genre`}
         onClick={(e) => handleClick(e)}
@@ -39,7 +39,7 @@ const GenreComponent: React.FC<Props> = ({ text, subGenres }) => {
           if (genre.variant === "LINK") {
             return (
               <MenuItem
-                sx={{ px: 1,width:"100%" }}
+                sx={{ px: 1, width: "100%" }}
                 component={"button"}
                 onClick={() => navigate(genre?.href || "")}
                 key={i}>
@@ -56,7 +56,7 @@ const GenreComponent: React.FC<Props> = ({ text, subGenres }) => {
           }
         })}
       </Menu>
-    </>
+    </Box>
   );
 };
 export default GenreComponent;
